@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>사과 받기 게임</title>
+<link rel="stylesheet" href="apple-game.css">
+</head>
+<body>
+
+<div class="game-wrap">
+  <div class="hud">
+    <div class="score">점수: <span id="score">0</span></div>
+    <div class="best">최고점: <span id="best">0</span></div>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="basket" id="basket">🧺</div>
+
+    <div class="overlay" id="startOverlay">
+      <h1>🍎 사과 받기 게임</h1>
+      <p>마우스를 움직여 바구니로 떨어지는 사과를 받으세요!<br>사과를 놓치면 게임 오버입니다.</p>
+      <button id="startBtn" class="btn">게임 시작</button>
+    </div>
+
+    <div class="overlay hidden" id="gameOverOverlay">
+      <h1>게임 오버</h1>
+      <p>최종 점수: <span id="finalScore">0</span></p>
+      <button id="restartBtn" class="btn">다시하기</button>
+    </div>
+  </div>
+</div>
+
+<script src="apple-game.js"></script>
+</body>
+</html>
