@@ -82,6 +82,34 @@ body {
   color: #9aa0b4;
 }
 
+.prompt-mic {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: #f0f1f8;
+  color: #6c5ce7;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.prompt-mic:hover {
+  background: #e6e3fb;
+}
+
+.prompt-mic:active {
+  transform: scale(0.94);
+}
+
+.prompt-mic.recording {
+  background: #ff3b30;
+  color: #fff;
+}
+
 .prompt-send {
   width: 42px;
   height: 42px;
