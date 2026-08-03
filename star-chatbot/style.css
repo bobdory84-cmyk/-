@@ -17,6 +17,10 @@ body {
   padding: 80px 40px 40px;
 }
 
+.landing-top[hidden] {
+  display: none;
+}
+
 .landing-top {
   display: flex;
   align-items: center;
@@ -53,6 +57,69 @@ body {
   font-weight: 700;
   color: #1c1e2b;
   text-align: left;
+}
+
+.results {
+  width: 100%;
+  max-width: 640px;
+  margin-top: 12px;
+}
+
+.results-status {
+  color: #6b6f85;
+  font-size: 14.5px;
+}
+
+.results-error {
+  color: #ff3b30;
+}
+
+.results-query {
+  margin: 0 0 16px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1c1e2b;
+}
+
+.results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.result-card {
+  display: block;
+  padding: 16px 18px;
+  border: 1px solid #e2e4f0;
+  border-radius: 14px;
+  text-decoration: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.result-card:hover {
+  border-color: #6c5ce7;
+  box-shadow: 0 6px 18px rgba(108, 92, 231, 0.12);
+}
+
+.result-title {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #6c5ce7;
+}
+
+.result-url {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: #9aa0b4;
+  word-break: break-all;
+}
+
+.result-desc {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #4a4d5c;
 }
 
 .prompt-form {
