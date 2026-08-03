@@ -2,7 +2,7 @@
   "name": "star-chatbot",
   "version": "1.0.0",
   "private": true,
-  "description": "스타 챗봇 - 실시간 웹 검색 연동",
+  "description": "스타 챗봇 - DuckDuckGo 실시간 웹 검색 연동",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

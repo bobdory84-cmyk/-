@@ -1,9 +1,7 @@
 const express = require('express');
-const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const BRAVE_API_KEY = process.env.BRAVE_API_KEY;
 
 app.use(express.static(__dirname));
 
@@ -12,38 +10,66 @@ app.get('/api/search', async (req, res) => {
   if (!query) {
     return res.status(400).json({ error: '검색어(q)가 필요합니다.' });
   }
-  if (!BRAVE_API_KEY) {
-    return res.status(500).json({ error: '서버에 BRAVE_API_KEY가 설정되어 있지 않습니다.' });
-  }
 
   try {
-    const url = new URL('https://api.search.brave.com/res/v1/web/search');
+    const url = new URL('https://html.duckduckgo.com/html/');
     url.searchParams.set('q', query);
-    url.searchParams.set('count', '8');
 
-    const braveRes = await fetch(url, {
+    const ddgRes = await fetch(url, {
       headers: {
-        Accept: 'application/json',
-        'X-Subscription-Token': BRAVE_API_KEY,
+        'User-Agent': 'Mozilla/5.0 (compatible; StarChatbot/1.0)',
       },
     });
 
-    if (!braveRes.ok) {
-      return res.status(braveRes.status).json({ error: 'Brave Search API 요청이 실패했습니다.' });
+    if (!ddgRes.ok) {
+      return res.status(502).json({ error: '검색 요청이 실패했습니다.' });
     }
 
-    const data = await braveRes.json();
-    const results = (data.web?.results || []).map((item) => ({
-      title: item.title,
-      url: item.url,
-      description: item.description,
-    }));
-
-    res.json({ results });
+    const html = await ddgRes.text();
+    res.json({ results: parseDuckDuckGoHtml(html).slice(0, 8) });
   } catch (err) {
     res.status(502).json({ error: '검색 서버 오류가 발생했습니다.' });
   }
 });
+
+function parseDuckDuckGoHtml(html) {
+  const results = [];
+  const resultRegex = /<a[^>]*class="result__a"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>[\s\S]*?<a[^>]*class="result__snippet"[^>]*>([\s\S]*?)<\/a>/g;
+
+  let match;
+  while ((match = resultRegex.exec(html)) !== null) {
+    const rawUrl = match[1];
+    const title = stripTags(match[2]);
+    const description = stripTags(match[3]);
+    results.push({
+      title,
+      url: resolveDuckDuckGoUrl(rawUrl),
+      description,
+    });
+  }
+  return results;
+}
+
+function resolveDuckDuckGoUrl(rawUrl) {
+  try {
+    const parsed = new URL(rawUrl, 'https://duckduckgo.com');
+    const target = parsed.searchParams.get('uddg');
+    return target ? decodeURIComponent(target) : parsed.toString();
+  } catch {
+    return rawUrl;
+  }
+}
+
+function stripTags(str) {
+  return str
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .trim();
+}
 
 app.listen(PORT, () => {
   console.log(`스타 챗봇 서버 실행 중: http://localhost:${PORT}`);
