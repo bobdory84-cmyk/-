@@ -19,18 +19,27 @@ promptForm.addEventListener('submit', async (event) => {
       throw new Error((await res.json().catch(() => ({}))).error || '검색 요청이 실패했습니다.');
     }
     const data = await res.json();
-    renderResults(query, data.results || []);
+    renderResults(query, data.results || [], data.summary || '');
   } catch (err) {
     results.innerHTML =
       '<p class="results-status results-error">검색에 실패했습니다: ' + escapeHtml(err.message) + '</p>';
   }
 });
 
-function renderResults(query, items) {
+function renderResults(query, items, summary) {
   if (!items.length) {
     results.innerHTML = '<p class="results-status">"' + escapeHtml(query) + '"에 대한 검색 결과가 없습니다.</p>';
     return;
   }
+
+  const summaryBlock = summary
+    ? `
+        <div class="summary-card">
+          <p class="summary-label">✦ 요약</p>
+          <p class="summary-text">${escapeHtml(summary)}</p>
+        </div>
+      `
+    : '';
 
   const list = items
     .map(
@@ -46,6 +55,7 @@ function renderResults(query, items) {
 
   results.innerHTML =
     '<p class="results-query">"' + escapeHtml(query) + '" 실시간 검색 결과</p>' +
+    summaryBlock +
     '<div class="results-list">' + list + '</div>';
 }
 

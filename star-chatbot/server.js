@@ -26,11 +26,22 @@ app.get('/api/search', async (req, res) => {
     }
 
     const html = await ddgRes.text();
-    res.json({ results: parseDuckDuckGoHtml(html).slice(0, 8) });
+    const results = parseDuckDuckGoHtml(html).slice(0, 8);
+    res.json({ results, summary: buildSummary(results) });
   } catch (err) {
     res.status(502).json({ error: '검색 서버 오류가 발생했습니다.' });
   }
 });
+
+function buildSummary(results) {
+  if (!results.length) return '';
+
+  const sentences = [];
+  for (const item of results.slice(0, 3)) {
+    if (item.description) sentences.push(item.description.replace(/\s+/g, ' ').trim());
+  }
+  return sentences.join(' ');
+}
 
 function parseDuckDuckGoHtml(html) {
   const results = [];

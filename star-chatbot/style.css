@@ -81,6 +81,29 @@ body {
   color: #1c1e2b;
 }
 
+.summary-card {
+  margin-bottom: 18px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #f0f1f8, #f6effc);
+  border: 1px solid #e2e4f0;
+}
+
+.summary-label {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6c5ce7;
+  letter-spacing: 0.02em;
+}
+
+.summary-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #33354a;
+}
+
 .results-list {
   display: flex;
   flex-direction: column;
