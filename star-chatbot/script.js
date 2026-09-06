@@ -11,53 +11,56 @@ promptForm.addEventListener('submit', async (event) => {
 
   landingTop.hidden = true;
   results.hidden = false;
-  results.innerHTML = '<p class="results-status">웹에서 실시간으로 검색 중...</p>';
+  results.innerHTML =
+    '<p class="results-status"><span class="dot-spinner"><span></span><span></span><span></span></span> 스타가 생각하는 중...</p>';
 
-  try {
-    const res = await fetch('/api/search?q=' + encodeURIComponent(query));
-    if (!res.ok) {
-      throw new Error((await res.json().catch(() => ({}))).error || '검색 요청이 실패했습니다.');
-    }
-    const data = await res.json();
-    renderResults(query, data.results || [], data.summary || '');
-  } catch (err) {
-    results.innerHTML =
-      '<p class="results-status results-error">검색에 실패했습니다: ' + escapeHtml(err.message) + '</p>';
-  }
-});
+  const [askResult, searchResult] = await Promise.allSettled([
+    fetch('/api/ask?q=' + encodeURIComponent(query)).then(async (res) => {
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'AI 응답 실패');
+      return res.json();
+    }),
+    fetch('/api/search?q=' + encodeURIComponent(query)).then(async (res) => {
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || '검색 실패');
+      return res.json();
+    }),
+  ]);
 
-function renderResults(query, items, summary) {
-  if (!items.length) {
-    results.innerHTML = '<p class="results-status">"' + escapeHtml(query) + '"에 대한 검색 결과가 없습니다.</p>';
-    return;
-  }
+  const summaryBlock =
+    askResult.status === 'fulfilled' && askResult.value.answer
+      ? `
+          <div class="summary-card">
+            <p class="summary-label">✦ 스타의 답변</p>
+            <p class="summary-text">${escapeHtml(askResult.value.answer)}</p>
+          </div>
+        `
+      : `
+          <div class="notice-card">
+            <p class="notice-desc">${escapeHtml(
+              askResult.status === 'rejected' ? askResult.reason.message : 'AI 답변을 가져오지 못했어요.'
+            )}</p>
+          </div>
+        `;
 
-  const summaryBlock = summary
-    ? `
-        <div class="summary-card">
-          <p class="summary-label">✦ 요약</p>
-          <p class="summary-text">${escapeHtml(summary)}</p>
-        </div>
-      `
+  const items = searchResult.status === 'fulfilled' ? searchResult.value.results || [] : [];
+  const sourcesBlock = items.length
+    ? '<p class="sources-label">참고할 만한 검색 결과</p><div class="results-list">' +
+      items
+        .map(
+          (item) => `
+            <a class="result-card" href="${escapeAttr(item.url)}" target="_blank" rel="noopener noreferrer">
+              <p class="result-title">${escapeHtml(item.title)}</p>
+              <p class="result-url">${escapeHtml(item.url)}</p>
+              <p class="result-desc">${escapeHtml(item.description)}</p>
+            </a>
+          `
+        )
+        .join('') +
+      '</div>'
     : '';
 
-  const list = items
-    .map(
-      (item) => `
-        <a class="result-card" href="${escapeAttr(item.url)}" target="_blank" rel="noopener noreferrer">
-          <p class="result-title">${escapeHtml(item.title)}</p>
-          <p class="result-url">${escapeHtml(item.url)}</p>
-          <p class="result-desc">${escapeHtml(item.description)}</p>
-        </a>
-      `
-    )
-    .join('');
-
   results.innerHTML =
-    '<p class="results-query">"' + escapeHtml(query) + '" 실시간 검색 결과</p>' +
-    summaryBlock +
-    '<div class="results-list">' + list + '</div>';
-}
+    '<p class="results-query">"' + escapeHtml(query) + '"</p>' + summaryBlock + sourcesBlock;
+});
 
 function escapeHtml(str) {
   const div = document.createElement('div');

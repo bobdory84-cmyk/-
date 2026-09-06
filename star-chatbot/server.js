@@ -82,6 +82,39 @@ function stripTags(str) {
     .trim();
 }
 
+const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'gemma3:4b';
+
+app.get('/api/ask', async (req, res) => {
+  const query = String(req.query.q || '').trim();
+  if (!query) {
+    return res.status(400).json({ error: '질문(q)이 필요합니다.' });
+  }
+
+  try {
+    const ollamaRes = await fetch(OLLAMA_URL + '/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: OLLAMA_MODEL,
+        prompt: '다음 질문에 한국어로 짧고 친절하게, 초등학생도 이해하기 쉽게 3문장 이내로 답해줘.\n질문: ' + query,
+        stream: false,
+      }),
+    });
+
+    if (!ollamaRes.ok) {
+      return res.status(502).json({ error: '올라마 서버 응답에 실패했습니다. ollama serve가 실행 중인지 확인해주세요.' });
+    }
+
+    const data = await ollamaRes.json();
+    res.json({ answer: (data.response || '').trim() });
+  } catch (err) {
+    res.status(502).json({
+      error: '올라마에 연결하지 못했습니다. 컴퓨터에서 Ollama 앱(또는 `ollama serve`)이 실행 중인지 확인해주세요.',
+    });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`스타 챗봇 서버 실행 중: http://localhost:${PORT}`);
 });

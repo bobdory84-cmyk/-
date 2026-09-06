@@ -14,6 +14,15 @@ if not exist node_modules (
   call npm install
 )
 
+where ollama >nul 2>nul
+if errorlevel 1 (
+  echo [안내] Ollama가 설치되어 있지 않은 것 같아요.
+  echo 진짜 AI 답변을 받으려면 Ollama 앱을 먼저 실행해주세요.
+) else (
+  echo Ollama 서버를 확인/실행합니다...
+  start "" /min ollama serve
+)
+
 start "" http://localhost:3000
 node server.js
 
