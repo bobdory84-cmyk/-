@@ -85,14 +85,15 @@ body {
   margin-bottom: 18px;
   padding: 18px 20px;
   border-radius: 16px;
-  background: linear-gradient(135deg, #ffd9e8, #ffc2dd);
+  border: 1px solid #e2e4f0;
+  background: #ffffff;
 }
 
 .summary-label {
   margin: 0 0 8px;
   font-size: 12px;
   font-weight: 700;
-  color: #c2185b;
+  color: #6c5ce7;
   letter-spacing: 0.02em;
 }
 
@@ -100,7 +101,7 @@ body {
   margin: 0;
   font-size: 14.5px;
   line-height: 1.7;
-  color: #4a1030;
+  color: #1c1e2b;
 }
 
 .notice-card {
